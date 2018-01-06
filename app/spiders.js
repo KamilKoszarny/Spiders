@@ -37,25 +37,25 @@ define (function play(require){
 	// alert(event.type +    ' key=' + event.key +    ' code=' + event.code);
 		if (event.repeat == false){
 			if (event.key == 'q')
-				spiders[0].angleChange += 20;
-			if (event.key == 'w')	
 				spiders[0].angleChange += -20;
+			if (event.key == 'w')	
+				spiders[0].angleChange += 20;
 			if (event.key == 'ArrowLeft')
-				spiders[1].angleChange += 20;
-			if (event.key == 'ArrowRight')	
 				spiders[1].angleChange += -20;
+			if (event.key == 'ArrowRight')	
+				spiders[1].angleChange += 20;
 		}
     }, false);
 	
 	document.addEventListener('keyup', function(event) {
 		if (event.key == 'q')
-			spiders[0].angleChange -= 20;
-		if (event.key == 'w')	
 			spiders[0].angleChange -= -20;
+		if (event.key == 'w')	
+			spiders[0].angleChange -= 20;
 		if (event.key == 'ArrowLeft')
-			spiders[1].angleChange -= 20;
+			spiders[1].angleChange -= -20;
 		if (event.key == 'ArrowRight')	
-			spiders[1].angleChange -= -20;	
+			spiders[1].angleChange -= 20;	
     }, false);			
 
 	
@@ -69,7 +69,7 @@ define (function play(require){
 	var r = 0;
 	
 	
-	setInterval(updateGame, 100);
+	setInterval(updateGame, 50);
 	// while(r < RM) {
 	function updateGame() {
 //save actual position	
@@ -119,213 +119,149 @@ define (function play(require){
 		}
 		
 		function checkWalls(spider, web, areas){
-		//top wall collide	
-			if (spider.y < 1.1){
+			
+			var corrPos = false;
+		//end at top wall (collide)
+			if (spider.y < 1.01){
 				//correct position
 				spider.y = 1;
-				if (spider.angle > 180)
-					spider.angle = 270;
-				else
-					spider.angle = 90;
+				if (!corrPos){
+					if (0 <= spider.angle && spider.angle <= 90 && !(spider.x > canvas.width - 1.01)){
+						spider.angle = 90;
+						corrPos = true;
+					}
+					else if ((270 <= spider.angle || spider.angle == 0) && !(spider.x < 1.01)){
+						spider.angle = 270;
+						corrPos = true;
+					}
+				}
 				
-				//start from top
-				
-				if (web.y[0] == 1 && web.y[1] > 1){
+				//start at top wall
+				if (web.y[0] == 1 && web.y[1] > 1)
 					wallCollision("top", "top", spider, web, areas);
-					
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// save area		
-					// web.x.push(spider.x);
-					// web.y.push(1);
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-					// console.log("area id: " + (area.id) + " area conWall: " + area.conWall);
-				}	
 				
-				//start from right
-				//wallCollision("top", "right", spider, web, areas);
-				if (web.x[0] == canvas.width - 1){
+				//start at right wall
+				if (web.x[0] == canvas.width - 1 && web.x[1] < canvas.width - 1)
 					wallCollision("top", "right", spider, web, areas);
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// //save area
-					// web.x.push(spider.x);
-					// web.y.push(1);		
-					// web.x.push(canvas.width - 1);
-					// web.y.push(1);						
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-				}
 				
-				//start from bottom
-				if (web.y[0] == canvas.height - 1){
+				//start at bottom wall
+				if (web.y[0] == canvas.height - 1 && web.y[1] < canvas.height - 1)
 					wallCollision("top", "bottom", spider, web, areas);
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// //save area
-					// web.x.push(spider.x);
-					// web.y.push(1);
-					// //check smaller area ...
-					// if (web.x[0] + spider.x > canvas.width) {					
-						// web.x.push(canvas.width - 1);
-						// web.x.push(canvas.width - 1);					
-					// } else {
-						// web.x.push(1);
-						// web.x.push(1);
-					// }
-					// web.y.push(1);
-					// web.y.push(canvas.height - 1);				
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-				}	
 				
-				//start from left
-				if (web.x[0] == 1){
+				//start at left wall
+				if (web.x[0] == 1 && web.x[1] > 1)
 					wallCollision("top", "left", spider, web, areas);
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// //save area
-					// web.x.push(spider.x);
-					// web.y.push(1);		
-					// web.x.push(1);
-					// web.y.push(1);						
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-				}
 				
+				//clear web
 				web.x.length = 0;
 				web.y.length = 0;
 			}
 			
-		//right wall collide
-			if (spider.x > canvas.width){
+		//end at right wall (collide)
+			if (spider.x > canvas.width - 1.01){
+				//correct position
 				spider.x = canvas.width - 1;
-				if (spider.angle >= 90)
-					spider.angle = 180;
-				else
-					spider.angle = 0;
-				
-				
-				//start from top
-				if (web.y[0] == 1 && web.y[1] > 1){
-					var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					area.name = spider.name;
-					//save area		
-					web.x.push(canvas.width - 1);
-					web.y.push(spider.y);	
-					web.x.push(canvas.width - 1);
-					web.y.push(1);
-					for (var p = 0; p < web.x.length; p++){
-						area.x.push(web.x[p]);
-						area.y.push(web.y[p]);
+				if (!corrPos){
+					if (90 <= spider.angle && spider.angle <= 180 && !(spider.y > canvas.height - 1.01)){
+						spider.angle = 180;
+						corrPos = true;
 					}
-					area.id.push(areas.length);
-					area.conWall = true;
-					areas.push(area);
-				}	
-				
-				//start from right
-				if (web.x[0] == canvas.width - 1){
-					var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					area.name = spider.name;
-					//save area
-					web.x.push(canvas.width - 1);
-					web.y.push(spider.y);						
-					for (var p = 0; p < web.x.length; p++){
-						area.x.push(web.x[p]);
-						area.y.push(web.y[p]);
+					else if (0 <= spider.angle && spider.angle <= 90) {
+						spider.angle = 0;
+						corrPos = true;
 					}
-					area.id.push(areas.length);
-					area.conWall = true;
-					areas.push(area);
 				}
+
 				
-				//start from bottom
-				//wallCollision("right", "bottom", spider, web, areas);
-				if (web.y[0] == canvas.height - 1){
-					var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					area.name = spider.name;
-					//save area
-					web.x.push(canvas.width - 1);
-					web.y.push(spider.y);
-					web.x.push(canvas.width - 1);
-					web.y.push(canvas.height - 1);				
-					for (var p = 0; p < web.x.length; p++){
-						area.x.push(web.x[p]);
-						area.y.push(web.y[p]);
-					}
-					area.id.push(areas.length);
-					area.conWall = true;
-					areas.push(area);
-				}	
+				//start at top wall
+				if (web.y[0] == 1 && web.y[1] > 1)
+					wallCollision("right", "top", spider, web, areas);
+				
+				//start at right wall
+				if (web.x[0] == canvas.width - 1 && web.x[1] < canvas.width - 1)
+					wallCollision("right", "right", spider, web, areas);
+				
+				//start at bottom wall
+				if (web.y[0] == canvas.height - 1 && web.y[1] < canvas.height - 1)
+					wallCollision("right", "bottom", spider, web, areas);
 				
 				//start from left
-				if (web.x[0] == 1){
-					var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					area.name = spider.name;
-					//save area
-					web.x.push(canvas.width - 1);
-					web.y.push(spider.y);	
-					//check smaller area ...		
-					if (web.y[0] + spider.y > canvas.height) {		
-						web.y.push(canvas.height - 1);
-						web.y.push(canvas.height - 1);
-					}	else {
-						web.y.push(1);
-						web.y.push(1);
-					}
-					web.x.push(canvas.width - 1);	
-					web.x.push(1);					
-					for (var p = 0; p < web.x.length; p++){
-						area.x.push(web.x[p]);
-						area.y.push(web.y[p]);
-					}
-					area.id.push(areas.length);
-					area.conWall = true;
-					areas.push(area);
-				}
-								
+				if (web.x[0] == 1 && web.x[1] > 1)
+					wallCollision("right", "left", spider, web, areas);
+					
+				//clear web
 				web.x.length = 0;
 				web.y.length = 0;
 			}
-		//down wall	
-			if (spider.y > canvas.height){
+			
+		//end at bottom wall (collide)
+			if (spider.y > canvas.height - 1.01){
+				//correct position
 				spider.y = canvas.height - 1;
-				if (spider.angle >= 180)
-					spider.angle = 270;
-				else
-					spider.angle = 90;
+				if (!corrPos){
+					if (180 <= spider.angle && spider.angle <= 270 && !(spider.x < 1.01)){
+						spider.angle = 270;
+						corrPos = true;
+					}
+					else if (90 <= spider.angle && spider.angle <= 180){
+						spider.angle = 90;
+						corrPos = true;
+					}
+				}
+				
+				//start at top wall
+				if (web.y[0] == 1 && web.y[1] > 1)
+					wallCollision("bottom", "top", spider, web, areas);
+				
+				//start at right wall
+				if (web.x[0] == canvas.width - 1 && web.x[1] < canvas.width - 1)
+					wallCollision("bottom", "right", spider, web, areas);
+				
+				//start at bottom wall
+				if (web.y[0] == canvas.height - 1 && web.y[1] < canvas.height - 1)
+					wallCollision("bottom", "bottom", spider, web, areas);
+				
+				//start from left
+				if (web.x[0] == 1 && web.x[1] > 1)
+					wallCollision("bottom", "left", spider, web, areas);				
+				
+				//clear web
 				web.x.length = 0;
 				web.y.length = 0;
 			}
-		//left wall	
-			if (spider.x < 0){
+			
+		//end at left wall (collide)
+			if (spider.x < 1.01){
+				//correct position
 				spider.x = 1;
-				if (spider.angle >= 270)
-					spider.angle = 0;
-				else
-					spider.angle = 180;
+				if (!corrPos){
+					if (270 <= spider.angle && spider.angle <= 360 && !(spider.y < 1.01)){
+						spider.angle = 0;
+						corrPos = true;
+					}
+					else if (180 <= spider.angle && spider.angle <= 270){
+						spider.angle = 180;
+						corrPos = true;
+					}
+				}
+				
+				//start at top wall
+				if (web.y[0] == 1 && web.y[1] > 1)
+					wallCollision("left", "top", spider, web, areas);
+				
+				//start at right wall
+				if (web.x[0] == canvas.width - 1 && web.x[1] < canvas.width - 1)
+					wallCollision("left", "right", spider, web, areas);
+				
+				//start at bottom wall
+				if (web.y[0] == canvas.height - 1 && web.y[1] < canvas.height - 1)
+					wallCollision("left", "bottom", spider, web, areas);
+				
+				//start from left
+				if (web.x[0] == 1 && web.x[1] > 1)
+					wallCollision("left", "left", spider, web, areas);				
+				
+				//clear web
 				web.x.length = 0;
 				web.y.length = 0;
 			}
@@ -363,23 +299,100 @@ define (function play(require){
 								web.y.push(1);	
 								break;
 						}
-						
-						for (var p = 0; p < web.x.length; p++){
-							area.x.push(web.x[p]);
-							area.y.push(web.y[p]);
-						}						
-						break;
+						break;	
 						
 					case "right":
+						web.x.push(canvas.width - 1);
+						web.y.push(spider.y);	
+						
+						switch (start){
+							case "top":
+								web.x.push(canvas.width - 1);
+								web.y.push(1);
+								break;
+							case "right":
+								break;
+							case "bottom":
+								web.x.push(canvas.width - 1);
+								web.y.push(canvas.height - 1);
+								break;
+							case "left":
+								if (web.y[0] + spider.y > canvas.height) {		
+									web.y.push(canvas.height - 1);
+									web.y.push(canvas.height - 1);
+								}	else {
+									web.y.push(1);
+									web.y.push(1);
+								}
+								web.x.push(canvas.width - 1);	
+								web.x.push(1);	
+								break;
+						}
 						break;
+						
 					case "bottom":
+						web.x.push(spider.x);
+						web.y.push(canvas.height - 1);	
+						
+						switch (start){
+							case "top":
+								if (web.x[0] + spider.x > canvas.width) {
+									web.x.push(canvas.width - 1);
+									web.x.push(canvas.width - 1);					
+								} else {
+									web.x.push(1);
+									web.x.push(1);
+								}
+								web.y.push(canvas.height - 1);
+								web.y.push(1);
+								break;
+							case "right":
+								web.x.push(canvas.width - 1);
+								web.y.push(canvas.height - 1);
+								break;
+							case "bottom":
+								break;
+							case "left":
+								web.x.push(1);
+								web.y.push(canvas.height - 1);
+								break;
+						}
 						break;
+						
 					case "left":
+						web.x.push(1);
+						web.y.push(spider.y);	
+						
+						switch (start){
+							case "top":
+								web.x.push(1);
+								web.y.push(1);
+								break;
+							case "right":
+								if (web.y[0] + spider.y > canvas.height) {		
+									web.y.push(canvas.height - 1);
+									web.y.push(canvas.height - 1);
+								}	else {
+									web.y.push(1);
+									web.y.push(1);
+								}
+								web.x.push(1);
+								web.x.push(canvas.width - 1);	
+								break;
+							case "bottom":
+								web.x.push(1);
+								web.y.push(canvas.height - 1);
+								break;
+							case "left":
+								break;
+						}
 						break;
 				}
 				
-			
-				
+				for (var p = 0; p < web.x.length; p++){
+					area.x.push(web.x[p]);
+					area.y.push(web.y[p]);
+				}						
 				area.id.push(areas.length);
 				area.conWall = true;
 				areas.push(area);
