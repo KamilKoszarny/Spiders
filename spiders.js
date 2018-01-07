@@ -1,17 +1,24 @@
+//Spiders
 "use strict";
 
 // var myVar = setInterval(myTimer, 100);
 
 // async function play(){
-define (function play(require){
+function play(){
 	
-	var classifyPoint = require("robust-pnp");
 	
 //hide menu	
 	var menuDiv = document.getElementById("menu")
 	menuDiv.style.display = "none";
 	var canvas = document.getElementById("game")
 	canvas.style.display = "block";
+	
+var polygon = [ [ 1, 1 ], [ 1, 3 ], [ 3, 3 ], [ 3, 1 ], [ 1, 1 ] ];
+
+// console.log(
+  // robustPointInPolygon(polygon, [2, 2]),
+  // robustPointInPolygon(polygon, [1, 1]),
+  // robustPointInPolygon(polygon, [100000, 10000]));
 	
 	
 //create objects
@@ -25,13 +32,11 @@ define (function play(require){
 						// {name: "three", x: [], y: []},
 						// {name: "four", x: [], y: []}];
 	
-	// var areas = [ 	{name: "one", x: [], y: [], count: [], startIndex: [], inAreas: [], conAreas: [], conWall: []}];
-	var areas = [ 	{name: "one", x: [], y: [], id: [], startIndex: [], inAreas: [], conAreas: [], conWall: false}];
-	// var areas = [ 	{name: "one", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false}];
-						// {name: "two", x: [], y: []},
-						// {name: "three", x: [], y: []},
-						// {name: "four", x: [], y: []}];
+	var areas = [ 	{id: [], name: "", x: [], y: [], inAreas: [], conAreas: [], conWall: false}];
+	
+	var freeArea = (canvas.height - 1) * (canvas.width - 1);
 
+	
 //add key handling
 	document.addEventListener('keypress', function(event) {
 	// alert(event.type +    ' key=' + event.key +    ' code=' + event.code);
@@ -99,15 +104,18 @@ define (function play(require){
 	}
 	
 	
+	
 	function move(){
 		r = r + 1;
 		for (var i = 0; i < spiders.length; i++){
 			step(spiders[i]);
 			
 			checkWalls(spiders[i], webs[i], areas);
-			checkWeb(spiders[i], webs[i], areas[i]);
+			checkWeb(spiders[i], webs[i], areas);
+			checkArea(spiders[i], webs[i], areas);
 		}
 	}
+	
 	
 		function step(spider){
 			spider.angle += spider.angleChange;
@@ -117,6 +125,7 @@ define (function play(require){
 			spider.x += Math.sin(Math.rad(spider.angle))*spider.speed;
 			spider.y += -Math.cos(Math.rad(spider.angle))*spider.speed;
 		}
+		
 		
 		function checkWalls(spider, web, areas){
 			
@@ -268,7 +277,7 @@ define (function play(require){
 		}
 		
 			function wallCollision(end, start, spider, web, areas){
-				var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
+				var area = {id: [], name: "", x: [], y: [], inAreas: [], conAreas: [], conWall: false};
 				area.name = spider.name;
 				
 				switch (end){
@@ -397,57 +406,11 @@ define (function play(require){
 				area.conWall = true;
 				areas.push(area);
 				
-				console.log("area id: " + (area.id) + " area conWall: " + area.conWall);
+				console.log("area: " + (area.id) + " conWall: " + area.conWall);
 			}
-		
-			// wallCollision("top", "right");
-				// if (web.x[0] == canvas.width - 1){
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// //save area
-					// web.x.push(spider.x);
-					// web.y.push(1);		
-					// web.x.push(canvas.width - 1);
-					// web.y.push(1);						
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-				// }
-		
-						// //start from bottom
-			// wallCollision("right", "bottom");
-				// if (web.y[0] == canvas.height - 1){
-					// var area = {name: "", x: [], y: [], id: [], inAreas: [], conAreas: [], conWall: false};
-					// area.name = spider.name;
-					// //save area
-					// web.x.push(canvas.width - 1);
-					// web.y.push(spider.y);
-					// web.x.push(canvas.width - 1);
-					// web.y.push(canvas.height - 1);				
-					// for (var p = 0; p < web.x.length; p++){
-						// area.x.push(web.x[p]);
-						// area.y.push(web.y[p]);
-					// }
-					// area.id.push(areas.length);
-					// area.conWall = true;
-					// areas.push(area);
-				// }	
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-		function checkWeb(spider, web, area){
+
+			
+		function checkWeb(spider, web, areas){
 			for (var w = 0; w < web.x.length; w++){
 				if (Math.sqrt(Math.pow(spider.x - web.x[w], 2) + Math.pow(spider.y - web.y[w], 2)) < spider.speed/1.5 
 				&& spider.x != 1 && spider.y != 1 && spider.x != canvas.width - 1 && spider.y != canvas.height - 1){
@@ -469,6 +432,12 @@ define (function play(require){
 			}			
 		}
 	
+		function checkArea(spider, web, areas){
+			for (var a = 0; a < areas.length; a++){
+				// console.log("area checking: " + areas[a].id);
+				
+			}
+		}
 	
 	function paintAreas(spiders, areas){
 		ctx.strokeStyle = 'black';	
@@ -499,6 +468,8 @@ define (function play(require){
 		}			
 	}
 	
+	
+	
 	function paintWeb(spider, web){
 		ctx.strokeStyle = spider.color;
 		ctx.beginPath();
@@ -507,6 +478,8 @@ define (function play(require){
 			ctx.lineTo(web.x[w], web.y[w]);
 		ctx.stroke();	
 	}
+	
+	
 	
 	function paintArrowhead(spider){
 		ctx.fillStyle = 'black';
@@ -522,7 +495,6 @@ define (function play(require){
 	}
 	
 }
-);
 
 
 
@@ -536,3 +508,9 @@ function menu(menuDiv, canvas){
 Math.rad = function(deg){
 	return deg * Math.PI / 180;
 }
+
+
+
+
+
+
