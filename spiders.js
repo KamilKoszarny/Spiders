@@ -2,36 +2,41 @@
 "use strict";
 
 function play(){
+//testing place
+	
+//initial data	
+	{
+		
+	//hide menu	
+		var menuDiv = document.getElementById("menu")
+		menuDiv.style.display = "none";
+		var canvas = document.getElementById("game")
+		canvas.style.display = "block";
 
-//hide menu	
-	var menuDiv = document.getElementById("menu")
-	menuDiv.style.display = "none";
-	var canvas = document.getElementById("game")
-	canvas.style.display = "block";
+	//general values	
+		canvas.width = 500;
+		canvas.height = 500;
+		var leftArea = (canvas.height - 1) * (canvas.width - 1);
+		var ctx = canvas.getContext("2d");
+		ctx.lineWidth = 3;
+		var gameSpeed = 6;
+		var timeInterval = 60;
+		var angleSpeed = 20;
 
-//general values	
-	canvas.width = 500;
-	canvas.height = 500;
-	var ctx = canvas.getContext("2d");
-	ctx.lineWidth = 3;
-	var gameSpeed = 12;
-	var timeInterval = 50;
-	var angleSpeed = 20;
+	//create objects
+		var spiders = [{id: 0, color: "blue", x: 10, y: 10, angle: 90, angleChange: 0, speed: gameSpeed}];
+							// {color: "red", x: 490, y: 490, angle: 270, angleChange: 0, speed: 20},
+							// {color: "green", x: 490, y: 10, angle: 180, angleChange: 0, speed: 10},
+							// {color: "yellow", x: 10, y: 490, angle: 0, angleChange: 0, speed: 10}];
+							
+		var webs = [	{x: [], y: []}];
+							// {x: [], y: []},
+							// {x: [], y: []},
+							// {x: [], y: []}];
+		
+		var areas = [ 	{id: [], color: "", x: [], y: [], inAreas: [], conAreas: [], neigAreas: [], conWall: false, size: 0, wallIndexes: []}];
 	
-//create objects
-	var spiders = [{id: 0, color: "blue", x: 10, y: 10, angle: 90, angleChange: 0, speed: gameSpeed}];
-						// {color: "red", x: 490, y: 490, angle: 270, angleChange: 0, speed: 20},
-						// {color: "green", x: 490, y: 10, angle: 180, angleChange: 0, speed: 10},
-						// {color: "yellow", x: 10, y: 490, angle: 0, angleChange: 0, speed: 10}];
-						
-	var webs = [	{x: [], y: []}];
-						// {x: [], y: []},
-						// {x: [], y: []},
-						// {x: [], y: []}];
-	
-	var areas = [ 	{id: [], color: "", x: [], y: [], inAreas: [], conAreas: [], neigAreas: [], conWall: false}];
-	
-	var leftArea = (canvas.height - 1) * (canvas.width - 1);
+	}
 
 //add key handling
 	document.addEventListener('keypress', function(event) {
@@ -83,20 +88,17 @@ function play(){
 		}
 	}
 	
-	
-	
-	function move(){
+	 function move(){
 		for (var i = 0; i < spiders.length; i++){
 			//step forward
 			step(spiders[i]);
 			
 			//check if you hit something
-			checkWalls(spiders[i], webs[i], areas);
-			checkWeb(spiders[i], webs[i], areas);
-			checkArea(spiders[i], webs[i], areas);
+			if(checkWeb(spiders[i], webs[i], areas)){}
+			else if (checkArea(spiders[i], webs[i], areas)){}
+			else if (checkWalls(spiders[i], webs[i], areas)){}
 		}
 	}
-	
 	
 		function step(spider){
 			spider.angle += spider.angleChange;
@@ -106,105 +108,10 @@ function play(){
 			spider.x += Math.sin(Math.rad(spider.angle))*spider.speed;
 			spider.y += -Math.cos(Math.rad(spider.angle))*spider.speed;
 		}
-		
-		
-		function checkWalls(spider, web, areas){
-			
-			var corrPos = false;
-			//end at top wall (collide)
-			if (spider.y < 1.01){
-				//correct position
-				spider.y = 1;
-				if (!corrPos){
-					if (0 <= spider.angle && spider.angle <= 90 && !(spider.x > canvas.width - 1.01)){
-						spider.angle = 90;
-						corrPos = true;
-					}
-					else if ((270 <= spider.angle || spider.angle == 0) && !(spider.x < 1.01)){
-						spider.angle = 270;
-						corrPos = true;
-					}
-				}
-				
-				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
-					createArea(spider, web, areas, spiders);
-			
-				//clear web
-				web.x.length = 0;
-				web.y.length = 0;
-			}
-		
-		//end at right wall (collide)
-			if (spider.x > canvas.width - 1.01){
-				//correct position
-				spider.x = canvas.width - 1;
-				if (!corrPos){
-					if (90 <= spider.angle && spider.angle <= 180 && !(spider.y > canvas.height - 1.01)){
-						spider.angle = 180;
-						corrPos = true;
-					}
-					else if (0 <= spider.angle && spider.angle <= 90) {
-						spider.angle = 0;
-						corrPos = true;
-					}
-				}
 
-				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
-					createArea(spider, web, areas, spiders);
-					
-				//clear web
-				web.x.length = 0;
-				web.y.length = 0;
-			}
-			
-		//end at bottom wall (collide)
-			if (spider.y > canvas.height - 1.01){
-				//correct position
-				spider.y = canvas.height - 1;
-				if (!corrPos){
-					if (180 <= spider.angle && spider.angle <= 270 && !(spider.x < 1.01)){
-						spider.angle = 270;
-						corrPos = true;
-					}
-					else if (90 <= spider.angle && spider.angle <= 180){
-						spider.angle = 90;
-						corrPos = true;
-					}
-				}
-				
-				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
-					createArea(spider, web, areas, spiders);		
-				
-				//clear web
-				web.x.length = 0;
-				web.y.length = 0;
-			}
-			
-		//end at left wall (collide)
-			if (spider.x < 1.01){
-				//correct position
-				spider.x = 1;
-				if (!corrPos){
-					if (270 <= spider.angle && spider.angle <= 360 && !(spider.y < 1.01)){
-						spider.angle = 0;
-						corrPos = true;
-					}
-					else if (180 <= spider.angle && spider.angle <= 270){
-						spider.angle = 180;
-						corrPos = true;
-					}
-				}
-				
-				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
-					createArea(spider, web, areas, spiders);			
-				
-				//clear web
-				web.x.length = 0;
-				web.y.length = 0;
-			}
-		}
 			
 		function checkWeb(spider, web, areas){
+			var hit = false;
 			for (var w = 0; w < web.x.length; w++){
 				if (Math.sqrt(Math.pow(spider.x - web.x[w], 2) + Math.pow(spider.y - web.y[w], 2)) < spider.speed/1.5 
 				&& spider.x != 1 && spider.y != 1 && spider.x != canvas.width - 1 && spider.y != canvas.height - 1){
@@ -226,17 +133,19 @@ function play(){
 					web.y[1] = web.y.pop();
 					web.x.length = 2;
 					web.y.length = 2;
+					
+					hit = true;
 				}
-			}			
+			}
+			return hit;
 		}
 	
 		function checkArea(spider, web, areas){
+			var hit = false;
 			for (var a = 1; a < areas.length; a++){
-				//save area as polygon
-				var polygon = createPolygon(areas[a]);
 
 				//if head hits area
-				if (inside(polygon, [spider.x, spider.y])){
+				if (inArea(areas[a], [spider.x, spider.y])){
 					
 					//start at top wall
 					if (web.y[0] == 1 && web.y[1] > 1)
@@ -260,9 +169,8 @@ function play(){
 					
 					//start at some area
 					for (var sa = 0; sa < areas.length; sa++){
-						var polygon = createPolygon(areas[sa]);
 						//yes
-						if (inside(polygon, [web.x[0], web.y[0]]) && web.x.length > 1){
+						if (inArea(areas[sa], [web.x[0], web.y[0]]) && web.x.length > 1){
 							console.log("area " + areas[a].id + " hit from area " + areas[sa].id);
 							//are areas connected?
 							if (areas[a].conAreas.indexOf(areas[sa].id) != -1 || a == sa){
@@ -275,7 +183,109 @@ function play(){
 					//clear web
 					web.x.length = 0;
 					web.y.length = 0;
+					hit = true;
 				}
+			}
+			return hit;
+		}
+		
+		function checkWalls(spider, web, areas){
+			var hit = false;
+			var corrPos = false;
+			//end at top wall (collide)
+			if (spider.y < 1.01){
+				//correct position
+				spider.y = 1;
+				if (!corrPos){
+					if (0 <= spider.angle && spider.angle <= 90 && !(spider.x > canvas.width - 1.01)){
+						spider.angle = 90;
+						corrPos = true;
+					}
+					else if ((270 <= spider.angle || spider.angle == 0) && !(spider.x < 1.01)){
+						spider.angle = 270;
+						corrPos = true;
+					}
+				}
+				
+				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
+					createArea(spider, web, areas, spiders);
+			
+				//clear web
+				web.x.length = 0;
+				web.y.length = 0;
+				hit = true;
+			}
+		
+			//end at right wall (collide)
+			if (spider.x > canvas.width - 1.01){
+				//correct position
+				spider.x = canvas.width - 1;
+				if (!corrPos){
+					if (90 <= spider.angle && spider.angle <= 180 && !(spider.y > canvas.height - 1.01)){
+						spider.angle = 180;
+						corrPos = true;
+					}
+					else if (0 <= spider.angle && spider.angle <= 90) {
+						spider.angle = 0;
+						corrPos = true;
+					}
+				}
+
+				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
+					createArea(spider, web, areas, spiders);
+					
+				//clear web
+				web.x.length = 0;
+				web.y.length = 0;
+				hit = true;
+			}
+			
+			//end at bottom wall (collide)
+			if (spider.y > canvas.height - 1.01){
+				//correct position
+				spider.y = canvas.height - 1;
+				if (!corrPos){
+					if (180 <= spider.angle && spider.angle <= 270 && !(spider.x < 1.01)){
+						spider.angle = 270;
+						corrPos = true;
+					}
+					else if (90 <= spider.angle && spider.angle <= 180){
+						spider.angle = 90;
+						corrPos = true;
+					}
+				}
+				
+				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
+					createArea(spider, web, areas, spiders);		
+				
+				//clear web
+				web.x.length = 0;
+				web.y.length = 0;
+				hit = true;
+			}
+			
+			//end at left wall (collide)
+			if (spider.x < 1.01){
+				//correct position
+				spider.x = 1;
+				if (!corrPos){
+					if (270 <= spider.angle && spider.angle <= 360 && !(spider.y < 1.01)){
+						spider.angle = 0;
+						corrPos = true;
+					}
+					else if (180 <= spider.angle && spider.angle <= 270){
+						spider.angle = 180;
+						corrPos = true;
+					}
+				}
+				
+				if (web.x.length > 3 && !freeWeb(web, areas, "wall"))
+					createArea(spider, web, areas, spiders);			
+				
+				//clear web
+				web.x.length = 0;
+				web.y.length = 0;
+				hit = true;
 			}
 		}
 		
@@ -284,15 +294,14 @@ function play(){
 				if (hit == "wall"){
 					//start on frame?
 					if (web.x[0] < 1.1 || web.y[0] < 1.1 || web.x[0] > canvas.width - 1.1 || web.y[0] > canvas.height - 1.1){
-						// console.log("frame");
+						console.log("start at frame");
 						return false;
 					}
 					//start on wall connected area?
 					for (var a = 0; a < areas.length; a++){
 						if (areas[a].conWall){
-							var polygon = createPolygon(areas[a]);
-							if (inside(polygon, [web.x[0], web.y[0]])){
-								// console.log("area");
+							if (inArea(areas[a], [web.x[0], web.y[0]])){
+								console.log("start at area");
 								return false;
 							}
 						}
@@ -303,9 +312,15 @@ function play(){
 			
 			function createArea(spider, web, areas, spiders){
 				
+				//cut start on area for aesthetics
+				if (inSomeArea({x: web.x[0], y: web.y[0]}, areas)){
+					web.shift();
+					cinsole.log("web.shift();");
+				}
+				
 				//create virtual complementary left/right webs (v - virtual)
-				var vWeb1 = {x: [], y: [], inAreas: [], neigAreas: []};
-				var vWeb2 = {x: [], y: [], inAreas: [], neigAreas: []};
+				var vWeb1 = {x: [], y: [], inAreas: [], neigAreas: [], conWall: false, size: 0};
+				var vWeb2 = {x: [], y: [], inAreas: [], neigAreas: [], conWall: false, size: 0};
 				for (var i = 0; i < web.x.length; i++){
 					vWeb1.x.push(web.x[i]);
 					vWeb2.x.push(web.x[i]);
@@ -314,22 +329,32 @@ function play(){
 				}
 				
 				//start 2 virtual loops to check which area you will fill
+				console.log("clockwise");
 				vWeb1 = virtualLoop(true, spider, vWeb1, areas);
+				console.log("");
+				console.log("");
+				console.log("counterclockwise");
 				vWeb2 = virtualLoop(false, spider, vWeb2, areas);
 
-				console.log(vWeb1);
-				console.log(vWeb2);
-				
 				vWeb1 = addInAreas(vWeb1, areas);
 				vWeb2 = addInAreas(vWeb2, areas);
 				
+				// console.log("cw:");
+				// console.log(vWeb1);
+				// console.log("ccw:");
+				// console.log(vWeb2);
+				
 				web = compareVWebs(vWeb1, vWeb2, areas, spiders, spider);
 				
-				var area = {id: areas.length, color: spider.color, x: web.x, y: web.y, inAreas: web.inAreas, conAreas: [], neigAreas: [], conWall: false};
+				var area = {id: areas.length, color: spider.color, x: web.x, y: web.y, inAreas: web.inAreas, conAreas: [], neigAreas: web.neigAreas, conWall: web.conWall, size: web.size, wallIndexes: []};
 				
-				area.neigAreas = checkNeigAreas(web, areas);
+				area = addWallIndexes(area);
+				//area.neigAreas = checkNeigAreas(web, areas);
 				
+				console.log(area);
 				areas.push(area);
+				leftArea -= area.size;
+				//console.log("leftArea" + leftArea);
 			}
 			
 				function virtualLoop(clockwise, spider, vWeb, areas){
@@ -337,43 +362,62 @@ function play(){
 					var vPos = {x: spider.x, y: spider.y};
 					vWeb.x.push(vPos.x);
 					vWeb.y.push(vPos.y);
-					var vWT = {pos: {x: 0, y: 0}, touchedArea: 0};
-					var vAT = {pos: {x: 0, y: 0}, touchedArea: 0};
+					var vWT = {pos: {x: 0, y: 0}, touchedArea: 0, touchedIndex: 0};
+					var vAS = {pos: {x: 0, y: 0}, touchedArea: 0, touchedIndex: 0};
 					var i = 0;
-					while(pointsDistance(vPos.x, vPos.y, vWeb.x[0], vWeb.y[0]) > spider.speed && i < 20){
+					var touchedArea = 0;
+					var touchedIndex = 0;
+					
+					//go tour till you reached web start (i for compiling)
+					while(pointsDistance(vPos.x, vPos.y, vWeb.x[0], vWeb.y[0]) > spider.speed && i < 300){
 						i++;
-						/*console.log("");
-						console.log(clockwise +" " + i);
+						console.log("");
+						/*console.log(clockwise +" " + i);
 						console.log("x: " + parseFloat(vPos.x).toFixed(2) +" y: "+ parseFloat(vPos.y).toFixed(2) +" w0x: "+ parseFloat(vWeb.x[0]).toFixed(2) +" w0y: "+ parseFloat(vWeb.y[0]).toFixed(2));
 
 						console.log("dist " + parseFloat(pointsDistance(vPos.x, vPos.y, vWeb.x[0], vWeb.y[0])).toFixed(2));
-						*/
+						*/	
+						console.log("area: " + touchedArea);
+						console.log("index: " + touchedIndex);
+						console.log("vPos: " + vPos.x, vPos.y);
 						
 						//at some area
-						if (vWt.touchedArea != 0){
-							// var areaToGo = 0;
-							// var indexToGo = 0;
+						if (touchedArea != 0){
 							
-							// take a step on area
-							// var lSI /*lastStepIndex*/ = vWeb.x.length - 2;
-							// vAS = virtAreaStep(vPos, {vWeb.x[lSI], vWeb.y[lSI]}, vWeb, area, areas, clockwise);
-							// vPos = vAS.vPos;
-							// if (vAS.touchedArea != 0)
-								// vWeb.neigAreas.push(vAS.touchedArea);
+							//take a step on area
+							var lSI /*lastStepIndex*/ = vWeb.x.length - 2;
+							vAS = virtAreaStep(vPos, {x: vWeb.x[lSI], y: vWeb.y[lSI]}, vWeb, touchedArea, touchedIndex, areas, clockwise);
+							//(vPos, lastVPos, vWeb, a, i, areas, clockwise)
+							vPos = vAS.vPos;
+							if (vAS.touchedArea != 0){
+								vWeb.neigAreas.push(vAS.touchedArea);
+								touchedArea = vAS.touchedArea;
+								touchedIndex = vAS.touchedIndex;
+								console.log("touchedArea: " + touchedArea);
+							} else {
+								touchedArea = vAS.touchedArea;
+								touchedIndex = vAS.touchedIndex;
+								console.log("touchedArea: " + touchedArea);
+							}
 							
-							// vWeb.x.push(vPos.x);
-							// vWeb.y.push(vPos.y);
+							vWeb.x.push(vPos.x);
+							vWeb.y.push(vPos.y);
+// debugger;
 						}
 						//at some wall
 						else{
 							//at top wall
 							if (vPos.y == 1){
+								vWeb.conWall = true;
 								if(clockwise){
 									//search for area on top wall at right...
 									vWT = virtWallTour(vPos, vWeb, areas, "top", "right");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
@@ -381,20 +425,27 @@ function play(){
 									//search for area on top wall at left
 									vWT = virtWallTour(vPos, vWeb, areas, "top", "left");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								}
 							}
 							//at right wall
 							if (vPos.x == canvas.width - 1){
+								vWeb.conWall = true;
 								if(clockwise){
 									//search for area on right wall at bottom
 									vWT = virtWallTour(vPos, vWeb, areas, "right", "bottom");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
@@ -402,48 +453,65 @@ function play(){
 									//search for area on right wall at top
 									vWT = virtWallTour(vPos, vWeb, areas, "right", "top");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								}
 							}
 							//at bottom wall
 							if (vPos.y == canvas.height - 1){
+								vWeb.conWall = true;
 								if(clockwise){
 									//search for area on bottom wall at left
 									vWT = virtWallTour(vPos, vWeb, areas, "bottom", "left");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								} else {
 									//search for area on bottom wall at right
 									vWT = virtWallTour(vPos, vWeb, areas, "bottom", "right");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								}
 							}
 							//at left wall
 							if (vPos.x == 1){
+								vWeb.conWall = true;
 								if(clockwise){
 									//search for area on left wall at top
 									vWT = virtWallTour(vPos, vWeb, areas, "left", "top");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								} else {
 									//search for area on left wall at bottom
 									vWT = virtWallTour(vPos, vWeb, areas, "left", "bottom");
 									vPos = vWT.vPos;
-									if (vWT.touchedArea != 0)
+									if (vWT.touchedArea != 0){
 										vWeb.neigAreas.push(vWT.touchedArea);
+										touchedArea = vWT.touchedArea;
+										touchedIndex = vWT.touchedIndex;
+									}
 									vWeb.x.push(vPos.x);
 									vWeb.y.push(vPos.y);
 								}
@@ -516,71 +584,133 @@ function play(){
 							corner[0] = 1;
 						}
 
-						
+// debugger;						
 						//search for area on wall at dir...
 						for (var a = 1; a < areas.length; a++){
-							var axl = areas[a].x.length;
-							var areaStart = 0;
-							var areaEnd = 0;
-							if (wallCoord == 'x'){
-								areaStart = areas[a].x[0];
-								areaEnd = areas[a].x[axl-1];
-							} else {
-								areaStart = areas[a].y[0];
-								areaEnd = areas[a].y[axl-1];
-							}
+							var lwp /*last wall point*/ = areas[a].x.length - 2;
+							var areaPoint = 0;
+							var areaWallPoint = 0;
 							
-							if(wRvr * areaStart < wRvr * wallLim && lRvr * vPosCoord < lRvr * areaStart && lRvr * areaStart < lRvr * limit){
-								limit = areaStart;
-								areaToGo = a;
-								indexToGo = 0;
+							for (var ai = 0; ai < lwp + 1; ai++){
+								if (areas[a].wallIndexes.indexOf(ai) != -1){
+									if (wallCoord == 'x'){
+										areaPoint = areas[a].y[ai];
+										areaWallPoint = areas[a].x[ai];
+									} else {
+										areaPoint = areas[a].x[ai];
+										areaWallPoint = areas[a].y[ai];
+									}
+									
+									if(wRvr * areaWallPoint < wRvr * wallLim && lRvr * vPosCoord < lRvr * areaPoint && lRvr * areaPoint < lRvr * limit){
+										limit = areaPoint;
+										areaToGo = a;
+										indexToGo = ai;
+									}
+								}
 							}
-							if(wRvr * areaEnd < wRvr * wallLim && lRvr * vPosCoord < lRvr * areaEnd && lRvr * areaEnd < lRvr * limit){
-								limit = areaEnd;
-								areaToGo = a;
-								indexToGo = axl-1;
-							}
+// debugger;							
 						}
-
 						//...save area point...
 						if (areaToGo != 0){
 							vPos.x = areas[areaToGo].x[indexToGo];
 							vPos.y = areas[areaToGo].y[indexToGo];
-							console.log("a " + areaToGo + " i " + indexToGo);
-							
-						} else	
+							//console.log("a " + areaToGo + " i " + indexToGo);
+//debugger;							
+						}
 						//..finish loop...		
 						if ((wRvr * vWebWallCoord < wRvr * wallLim && lRvr * vPosCoord < lRvr * vWebCoord && lRvr * vWebCoord < lRvr * limit && lRvr * limit > lRvr * vPosCoord)){
 							console.log('loop finished');
 							vPos.x = vWeb.x[0];
 							vPos.y = vWeb.y[0];
 						//...or wall dir corner.
-						} else {
+						} else if (areaToGo == 0) {
 							console.log('corner');
 							vPos.x = corner[0];
 							vPos.y = corner[1];
 						}
-						return {vPos: vPos, touchedArea: areaToGo};
+						return {vPos: vPos, touchedArea: areaToGo, touchedIndex: indexToGo};
 						// return vPos;
 					}
 				
-					// function virtAreaStep(vPos, lastVPos, vWeb, area, areas, clockwise){
-						// var areaToGo = 0;
-						// var indexToGo = 0;
+					function virtAreaStep(vPos, lastVPos, vWeb, a, i, areas, clockwise){
+						var areaToGo = 0;
+
+						//console.log(inArea(areas[a], lastVPos));
 						
-						
-						
-						// return {vPos: vPos, touchedArea: areaToGo};
-					// }
+						//touched wall?
+						if ((vPos.y < 1.001 || vPos.x > canvas.width -1.001 || vPos.y > canvas.height - 1.001 || vPos.x < 1.001) && inArea(areas[a], lastVPos)){
+							console.log("touched wall");
+						}
+						else {
+							areaToGo = a;
+							var indexToGo = i;
+							
+							var axl = areas[a].x.length;
+							//create vPositions for both sides
+							var vPos1 = {x: areas[a].x[(i + 1)%axl]
+										,y: areas[a].y[(i + 1)%axl]}
+							var vPos2 = {x: areas[a].x[(i - 1 + axl)%axl]
+										,y: areas[a].y[(i - 1 + axl)%axl]}
+							
+							console.log("vPos1: " + vPos1.x, vPos1.y + " vPos2: " + vPos2.x, vPos2.y);
+							console.log("lastVPos: " + lastVPos.x, lastVPos.y);
+							
+							//not back
+							if (closePoints(vPos1, lastVPos, 0.01))
+								vPos = vPos2;
+							else if (closePoints(vPos2, lastVPos, 0.01))
+								vPos = vPos1;
+							//free hand side
+							else if (freeSide(vPos1, vPos, areas[a], clockwise) && i != axl - 2)
+								vPos = vPos1;
+							else if (freeSide(vPos2, vPos, areas[a], clockwise))
+								vPos = vPos2;
+							
+							if (vPos == vPos1)
+								indexToGo++;
+							else
+								indexToGo--;
+//debugger;							
+							//touched other area?
+							for (var oa = 1; oa < areas.length; oa++){
+								if (oa != a){
+									for (var oap = 0; oap < areas[oa].x.length; oap++){
+										if(vPos.x == areas[oa].x[oap] && vPos.y == areas[oa].y[oap]){
+											areaToGo = oa;
+											indexToGo = oap;
+											console.log("areaToGo " + areaToGo + " indexToGo " + indexToGo);
+										}
+									}
+								}
+							}
+						}
+						return {vPos: vPos, touchedArea: areaToGo, touchedIndex: indexToGo};
+					}
+					
+						function freeSide(pos, posBefore, area, clockwise){
+							var sidePos = {x: 0, y:0};
+
+							var angle = Math.atan2(pos.y - posBefore.y, pos.x - posBefore.x);
+							if (clockwise)
+								angle -= Math.PI/2;
+							else
+								angle += Math.PI/2;
+							
+							sidePos.x = pos.x + Math.cos(angle);
+							sidePos.y = pos.y - Math.sin(angle);
+//debugger;							
+							if (inArea(area, sidePos))
+								return false;
+							else
+								return true;
+						}
 					
 				function addInAreas(vWeb, areas){
-					//polygon from vWeb
-					var polygon = createPolygon(vWeb);
 					
 					//is area in this polygon?
 					for (var a = 0; a < areas.length; a++){
 						// area point is in polygon and area is not neighbor
-						if (inside(polygon, [areas[a].x[0],areas[a].y[0]]) && vWeb.neigAreas.indexOf(a) == -1){
+						if (inArea(vWeb, [areas[a].x[0], areas[a].y[0]]) && vWeb.neigAreas.indexOf(a) == -1){
 							console.log("point inside area");
 							vWeb.inAreas.push(a);
 						}
@@ -593,8 +723,10 @@ function play(){
 					var area2 = polygonArea(vWeb2.x, vWeb2.y, vWeb2.x.length);
 					area1 -= areasInArea(vWeb1, areas);
 					area2 -= areasInArea(vWeb2, areas);
+					vWeb1.size = area1;
+					vWeb2.size = area2;
 					
-					console.log("area1: " + area1 + " area2: " + area2);
+					//console.log("area1: " + area1 + " area2: " + area2);
 					
 					var spidersIn1 = spidersInArea(vWeb1, spiders, spider);
 					var spidersIn2 = spidersInArea(vWeb2, spiders, spider);
@@ -602,50 +734,51 @@ function play(){
 					if (spidersIn1 < spidersIn2)
 						return vWeb1;
 					if (spidersIn1 > spidersIn2){
-						console.log('s1');
+						//console.log('s1');
 						return vWeb2;
 					}
 					
 					if (area1 < area2){
-						console.log('a1');
+						//console.log('a1');
 						return vWeb1;
 					}
 					if (area1 > area2)
 						return vWeb2;
 				}
 			
-				function checkNeigAreas(web, areas){
-					for (var a = 0; a < areas.length; a++){
-						for (var wp = 0; wp < web.x.length; wp++){
-							//if (areas[a].x
-							
-							
-							
-						}
+				function addWallIndexes(area){
+					for (var i = 0; i < area.x.length - 1; i++)
+						if (area.x[i] < 1.1 || area.y[i] < 1.1 || area.x[i] > canvas.width - 1.1 || area.y[i] > canvas.height - 1.1){
+							area.wallIndexes.push(i);
 					}
-					
-					
+					return area;
 				}
 			
 	function paintAreas(spiders, areas){
 		ctx.strokeStyle = 'black';	
-		for (var i = 0; i < areas.length; i++){
-			//choose color
-			for (var s = 0; s < spiders.length; s++){
-				if (areas[i].color = spiders[s].color)
-					ctx.fillStyle = spiders[s].color;
-			}
-				
+		for (var a = 0; a < areas.length; a++){
+			//set color
+			ctx.fillStyle = areas[a].color;
+
 			//go through edge	
 			ctx.beginPath();
-			ctx.moveTo(areas[i].x[0], areas[i].y[0]);
-			for (var p = 1; p < areas[i].x.length; p++){
-				ctx.lineTo(areas[i].x[p], areas[i].y[p]);
-			}			
+			ctx.moveTo(areas[a].x[0], areas[a].y[0]);
+			for (var ap = 1; ap < areas[a].x.length; ap++){
+				ctx.lineTo(areas[a].x[ap], areas[a].y[ap]);
+			}
 			ctx.closePath();
+			//make holes for inside areas
+			for (var ia = 0; ia < areas[a].inAreas.length; ia++){
+				var iaId = areas[a].inAreas[ia];
+				ctx.moveTo(areas[iaId].x[0], areas[iaId].y[0]);
+				for (var ap = 1; ap < areas[iaId].x.length; ap++){
+					ctx.lineTo(areas[iaId].x[ap], areas[iaId].y[ap]);
+				}
+			}
 			
 			//paint
-			ctx.fill();
+			ctx.mozFillRule = 'evenodd'; //for old firefox 1~30
+			ctx.fill('evenodd');
 			ctx.stroke();	
 		}			
 	}
@@ -680,6 +813,39 @@ function play(){
 }
 
 
+
+
+function closePoints(p1, p2, limit){
+	var dist = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+	if (dist < limit) 
+		return true;
+	else 
+		return false;
+}
+
+//point in area
+function inArea(area, point){
+	var polygon = createPolygon({x: area.x, y: area.y});
+	var onEdge = false;
+	for (var ap = 0; ap < area.x.length; ap++){
+		if (Math.abs(point.x - area.x[ap]) < 0.01 && Math.abs(point.y - area.y[ap]) < 0.01)
+			onEdge = true;
+	}
+			
+	return (inside (polygon, point) || onEdge); 
+}
+
+function inSomeArea(point, areas){
+	var iSA = false;
+	for (var a = 0; a < areas[a].x.length; a++){
+		if (inArea(areas[a], point)){
+			iSA = true;
+		}
+	}
+	
+	return iSA; 
+}
 //point in polygon
 function inside(vs, point) {
     // ray-casting algorithm based on
@@ -759,10 +925,9 @@ function areasInArea(vWeb, areas){
 }
 
 function spidersInArea(vWeb, spiders, spider){
-	var polygon = createPolygon(vWeb);
 	var spidersIn = 0;
 	for (var s = 0; s < spiders.length; s++){
-		if (s != spider.id && inside(polygon, [spiders[s].x, spiders[s].y]))
+		if (s != spider.id && inArea(vWeb, [spiders[s].x, spiders[s].y]))
 			spidersIn++;
 	}
 	return spidersIn;
@@ -776,6 +941,10 @@ function menu(menuDiv, canvas){
 
 Math.rad = function(deg){
 	return deg * Math.PI / 180;
+}
+
+Math.deg = function(rad){
+	return rad / Math.PI * 180;
 }
 
 function pointsDistance(x1, y1, x2, y2){
